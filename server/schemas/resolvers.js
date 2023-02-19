@@ -1,4 +1,6 @@
 const { User, Thought } = require("../models");
+const { AuthenticationError } = require("apollo-server-express"); // handles wrong username/password errors
+
 // Resolvers: functions connected to each query or mutation type definition that perform the CRUD actions that each query or mutation is expected to perform.
 // analogous to controller files
 // https://www.apollographql.com/docs/apollo-server/data/resolvers/#resolver-arguments
@@ -37,6 +39,26 @@ const resolvers = {
         .populate('thoughts')
     }
   },
+  Mutation: {
+    addUser: async (parent, args) => {
+      const user = await User.create(args);
+      return user
+    },
+    
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new AuthenticationError('incorrect credentials');
+      }
+
+      const correctPw = await user.isCorrectPassword(password);
+      if (!correctPw) {
+        throw new AuthenticationError('incorrect credentials');
+      }
+
+      return user;
+    },
+  }
 };
 
 module.exports = resolvers;
