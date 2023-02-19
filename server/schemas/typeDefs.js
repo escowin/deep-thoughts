@@ -1,7 +1,6 @@
-// Type definitions: involves defining every piece of data that the client can expect to work with through a query or mutation. Every GraphQL API starts with defining this data, as this type of strict type definition gives the client clarity as to what they ask for and what they can expect in return. Defines not only the API endpoint, but also defines the exact data and parameters tied to the endpoint.
+const { gql } = require('apollo-server-express'); // imports gql tagged template function
 
-// imports gql tagged template function
-const { gql } = require('apollo-server-express');
+// Type definitions: involves defining every piece of data that the client can expect to work with through a query or mutation. Every GraphQL API starts with defining this data, as this type of strict type definition gives the client clarity as to what they ask for and what they can expect in return. Defines not only the API endpoint, but also defines the exact data and parameters tied to the endpoint.
 
 // creates typeDefs | all type definitions go into the tagged template function
 const typeDefs = gql`
@@ -38,8 +37,13 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        login(email: String!, password: String!): User
-        addUser(username: String!, email: String!, password: String!): User
+        login(email: String!, password: String!): Auth
+        addUser(username: String!, email: String!, password: String!): Auth
+    }
+
+    type Auth {
+        token: ID!
+        user: User
     }
 `;
 
