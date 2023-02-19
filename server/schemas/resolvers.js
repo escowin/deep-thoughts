@@ -10,6 +10,19 @@ const resolvers = {
   // query | get
   Query: {
     // placeholder paramater (parent) needed to able to access second parameter (username)
+
+    me: async (parent, args, context) => {
+      if (context.user) {
+        const userData = await User.findOne({ _id: context.user._id })
+          .select("-__v -password")
+          .populate("thoughts")
+          .populate("friends");
+
+        return userData;
+      }
+
+      throw new AuthenticationError("not logged in");
+    },
     // ternary operates checks if username exists.
     // - if so, sets params to an object with user key-value.
     // - if not, returns an empty string.
@@ -65,6 +78,42 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
+
+    // put | only logged in users can use this mutation
+    addThought: async (parent, args, context) => {
+      // jwt includes user's username, email, and _id
+      if (context.user) {
+        const thought = await Thought.create({
+          ...args,
+          username: context.user.username,
+        });
+
+        await User.findByIdAndUpdate(
+          { _id: context.user._id },
+          { $push: { thoughts: thought._id } },
+          { new: true } // updates original document with new edits
+        );
+
+        return thought;
+      }
+
+      throw new AuthenticationError("you need to be logged in");
+    },
+
+    // reactions are stored as array on the Thought model hence the need for $push operator
+    addReaction: async (parent, { thoughtId, reactionBody }, context) => {
+      if (context.user) {
+        const updatedThought = await Thought.findOneAndUpdate(
+          { _id: thoughtId },
+          { $push: { reactions: { reactionBody, username: context.user.username } } },
+          { new: true, runValidators: true }
+        );
+
+        return updatedThought;
+      }
+
+      throw new AuthenticationError('you need to be logged in');
+    }
   },
 };
 
