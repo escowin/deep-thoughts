@@ -100,20 +100,39 @@ const resolvers = {
       throw new AuthenticationError("you need to be logged in");
     },
 
-    // reactions are stored as array on the Thought model hence the need for $push operator
+    // reactions are stored as array on the Thought model hence the need for $push mongo operator
     addReaction: async (parent, { thoughtId, reactionBody }, context) => {
       if (context.user) {
         const updatedThought = await Thought.findOneAndUpdate(
           { _id: thoughtId },
-          { $push: { reactions: { reactionBody, username: context.user.username } } },
+          {
+            $push: {
+              reactions: { reactionBody, username: context.user.username },
+            },
+          },
           { new: true, runValidators: true }
         );
 
         return updatedThought;
       }
 
-      throw new AuthenticationError('you need to be logged in');
-    }
+      throw new AuthenticationError("you need to be logged in");
+    },
+
+    // looks for incoming friendId, adds the id to current user's friends array
+    addFriend: async (parent, { friendId }, context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { friends: friendId } }, // mongo operator | prevents duplicate entries
+          { new: true }
+        ).populate("friends");
+
+        return updatedUser;
+      }
+
+      throw new AuthenticationError("You need to be logged in.");
+    },
   },
 };
 
