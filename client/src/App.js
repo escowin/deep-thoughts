@@ -4,12 +4,18 @@ import {
   InMemoryCache, // enables apollo client instance to cache api response data. more efficient performance requests
   createHttpLink, // controls how apollo client makes requests. outbound network request middleware
 } from "@apollo/client";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // gives multi page appearance to spa
 
 import React from "react";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import Login from './pages/Login';
+import NoMatch from './pages/NoMatch';
+import Profile from './pages/Profile';
+import Signup from './pages/Signup';
+import SingleThought from './pages/SingleThought';
 
 const httpLink = createHttpLink({ // establishes a new graphql server link
   // uri | avoids absolute paths (proxy key-value added to package.json to handle development & production env)
@@ -27,13 +33,22 @@ function App() {
   return (
     // enables application to interact with apollo client instance. client variable passed as client prop value allows everything inside oto have access to the server's api data.
     <ApolloProvider client={client}>
-      <div className="flex-column justify-flex-start min-100-vh">
-        <Header />
-        <div className="container">
-          <Home />
+      <Router>
+        <div className="flex-column justify-flex-start min-100-vh">
+          <Header />
+          <div className="container">
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/signup' element={<Signup />} />
+              <Route path='/profile' element={<Profile />} />
+              <Route path='/thought' element={<SingleThought />} />
+              <Route path="*" element={<NoMatch />} />
+            </Routes>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+      </Router>
     </ApolloProvider>
   );
 }
