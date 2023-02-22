@@ -12,7 +12,6 @@ const Home = () => {
   // optional chaining | ?. | browser supported only.
   // - existing data is stored in const ||  undefined data is an empty array.
   const thoughts = data?.thoughts || [];
-  console.log(thoughts);
 
   return (
     <main>
