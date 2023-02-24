@@ -4,6 +4,7 @@ import {
   InMemoryCache, // enables apollo client instance to cache api response data. more efficient performance requests
   createHttpLink, // controls how apollo client makes requests. outbound network request middleware
 } from "@apollo/client";
+import { setContext } from '@apollo/client/link/context'; // retrieves jwt everytime a graphql req is made
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // gives multi page appearance to spa
 
 import React from "react";
@@ -22,9 +23,21 @@ const httpLink = createHttpLink({ // establishes a new graphql server link
   uri: '/graphql',
 });
 
+// configures auth link to includes jwt in header in graphql reqs regardless if its needed or not. '_' servers as a placeholder since first parameter is not needed, but needs to be included in setContext()
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('id_token')
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    }
+  }
+})
+
 // instantiates apollo client & creates the api endpoint connection
 const client = new ApolloClient({
-  link: httpLink,
+  // every request retrieves jwt and sets the request headers before making the req to the api
+  link: authLink.concat(httpLink),
   // instantiates cache object
   cache: new InMemoryCache(),
 });

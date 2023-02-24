@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client'
 import { ADD_USER } from '../utils/mutations'
 
+import Auth from '../utils/auth';
+
 const Signup = () => {
   const [formState, setFormState] = useState({ username: '', email: '', password: '' });
 
@@ -24,7 +26,9 @@ const Signup = () => {
     // try...catch | handles errors, useful with async promises. allows async/await to be used instead of .then()...catch()
     try {
       const { data } = await addUser({variables: { ...formState }})
-      console.log(data)
+      
+      // successful login redirects to homepage
+      Auth.login(data.addUser.token);
     } catch (e) {
       console.error(e)
     }
