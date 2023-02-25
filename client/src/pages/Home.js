@@ -6,6 +6,7 @@ import Auth from '../utils/auth';
 
 import ThoughtList from "../components/ThoughtList";
 import FriendList from "../components/FriendList";
+import ThoughtForm from "../components/ThoughtForm";
 
 const Home = () => {
   // uses hook to make query request. loading analogous to fetch(). promises en react are cumbersome. the loading property conditionally renders data to display based on its existence. the {data} is every graphql response.
@@ -25,6 +26,12 @@ const Home = () => {
   return (
     <main>
       <div className="flex-row justify-space-between">
+        {/* short circuit expression to conditionally render form */}
+        {loggedIn && (
+          <div className="col-12 mb-3">
+            <ThoughtForm/>
+          </div>
+        )}
         <div className={`col-12 mb-3 ${loggedIn && 'col-lg-8'}`}>
           {/* ternary conditional rendering | once the query is complete & loading undefined, thoughts array & title are passed as props into component  */}
           {loading ? (
