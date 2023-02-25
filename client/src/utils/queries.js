@@ -86,15 +86,16 @@ export const QUERY_ME = gql`
 
 // tbd | look up 'directives' to use the same front-end query to request less information
 export const QUERY_ME_BASIC = gql`
-{
-  me {
-    _id
-    username
-    email
-    friendCount
-    friends {
+  {
+    me {
       _id
       username
+      email
+      friendCount
+      friends {
+        _id
+        username
+      }
     }
   }
-}`
+`;
